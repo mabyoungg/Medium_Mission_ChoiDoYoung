@@ -3,7 +3,6 @@ package com.ll.likelionspringboottestmedium.global.security;
 import com.ll.likelionspringboottestmedium.domain.memeber.memeber.entity.Member;
 import com.ll.likelionspringboottestmedium.domain.memeber.memeber.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -29,7 +28,8 @@ public class CustomUserDetailsService implements UserDetailsService {
 
         Member member = opMember.get();
 
-        return new User(
+        return new SecurityUser(
+                member.getId(),
                 member.getUsername(),
                 member.getPassword(),
                 member.getAuthorities()
