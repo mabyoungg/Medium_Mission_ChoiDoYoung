@@ -47,10 +47,14 @@ public class PostService {
     }
 
     public boolean canModify(Member actor, Post post) {
+        if (actor == null) return false;
+
         return actor.equals(post.getAuthor());
     }
 
     public boolean canDelete(Member actor, Post post) {
+        if (actor == null) return false;
+
         if ( actor.isAdmin() ) return true;
 
         return actor.equals(post.getAuthor());
