@@ -4,6 +4,7 @@ import com.ll.likelionspringboottestmedium.domain.memeber.memeber.entity.Member;
 import com.ll.likelionspringboottestmedium.domain.post.post.entity.Post;
 import com.ll.likelionspringboottestmedium.domain.post.post.repository.PostRepository;
 import com.ll.likelionspringboottestmedium.domain.post.postComment.entity.PostComment;
+import com.ll.likelionspringboottestmedium.domain.post.postComment.service.PostCommentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -18,6 +19,7 @@ import java.util.Optional;
 @Transactional(readOnly = true)
 public class PostService {
     private final PostRepository postRepository;
+    private final PostCommentRepository postCommentRepository;
 
     @Transactional
     public Post write(Member author, String title, String body, boolean isPublished) {
@@ -103,5 +105,28 @@ public class PostService {
     @Transactional
     public PostComment writeComment(Member actor, Post post, String body) {
         return post.writeComment(actor, body);
+    }
+
+    public boolean canModifyComment(Member actor, PostComment comment) {
+        if (actor == null) return false;
+
+        return actor.equals(comment.getAuthor());
+    }
+
+    public boolean canDeleteComment(Member actor, PostComment comment) {
+        if (actor == null) return false;
+
+        if (actor.isAdmin()) return true;
+
+        return actor.equals(comment.getAuthor());
+    }
+
+    public Optional<PostComment> findCommentById(long id) {
+        return postCommentRepository.findCommentById(id);
+    }
+
+    @Transactional
+    public void modifyComment(PostComment postComment, String body) {
+        postComment.setBody(body);
     }
 }
