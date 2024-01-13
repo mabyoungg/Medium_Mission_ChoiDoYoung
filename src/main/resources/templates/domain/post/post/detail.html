@@ -77,6 +77,19 @@
         </form>
     </th:block>
 
+    <h3>댓글 목록</h3>
+
+    <ul>
+        <li style="scroll-margin-top: 50px;" th:each="postComment : ${post.comments}"
+            th:id="|postComment-${postComment.id}|">
+            <div>
+                <div th:text="${postComment.id}"></div>
+                <div th:text="${postComment.body}"></div>
+                <div th:text="${postComment.author.username}"></div>
+                <div th:text="${postComment.createDate}"></div>
+            </div>
+        </li>
+    </ul>
 </div>
 
 </body>
