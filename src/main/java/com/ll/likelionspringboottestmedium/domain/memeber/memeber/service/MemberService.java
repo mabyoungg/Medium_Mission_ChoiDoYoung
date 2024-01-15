@@ -5,6 +5,8 @@ import com.ll.likelionspringboottestmedium.domain.memeber.memeber.repository.Mem
 import com.ll.likelionspringboottestmedium.global.rsData.RsData;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Profile;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -40,5 +42,9 @@ public class MemberService {
 
     public long count() {
         return memberRepository.count();
+    }
+
+    public Page<Member> search(String kw, Pageable pageable) {
+        return memberRepository.findByUsernameContainsIgnoreCase(kw, pageable);
     }
 }
