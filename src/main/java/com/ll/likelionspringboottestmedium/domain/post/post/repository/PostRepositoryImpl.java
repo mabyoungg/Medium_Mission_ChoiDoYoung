@@ -21,11 +21,11 @@ import static com.ll.likelionspringboottestmedium.domain.post.post.entity.QPost.
 public class PostRepositoryImpl implements PostRepositoryCustom {
     private final JPAQueryFactory jpaQueryFactory;
 
-    public Page<Post> search(boolean isPublished, String kw, Pageable pageable) {
+    public Page<Post> search(boolean published, String kw, Pageable pageable) {
 
         // 조건 생성
         BooleanExpression condition = post
-                .isPublished.eq(isPublished);
+                .published.eq(published);
 
         if (kw != null && !kw.isBlank()) {
             condition = condition.and(
@@ -58,14 +58,14 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
     }
 
     @Override
-    public Page<Post> search(Member author, Boolean isPublished, String kw, Pageable pageable) {
+    public Page<Post> search(Member author, Boolean published, String kw, Pageable pageable) {
         // 조건 생성
         BooleanExpression condition = post
                 .author.eq(author);
 
-        if (isPublished != null) {
+        if (published != null) {
             condition = condition.and(
-                    post.isPublished.eq(isPublished)
+                    post.published.eq(published)
             );
         }
 

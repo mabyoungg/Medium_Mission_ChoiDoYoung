@@ -73,59 +73,44 @@ public class PostController {
     }
 
     @PreAuthorize("isAuthenticated()")
-    @GetMapping("/write")
-    public String showWrite() {
-        return "domain/post/post/write";
-    }
+    @PostMapping("/makeTemp")
+    public String makeTemp() {
+        Post post = postService.findTempOrMake(rq.getMember());
 
-    @Getter
-    @Setter
-    public static class WriteForm {
-        @NotBlank
-        private String title;
-        @NotBlank
-        private String body;
-        private boolean isPublished;
+
+        return rq.redirect("/post/%d/edit".formatted(post.getId()), post.getId() + "번 임시글이 생성되었습니다.");
     }
 
     @PreAuthorize("isAuthenticated()")
-    @PostMapping("/write")
-    public String write(@Valid WriteForm form) {
-        Post post = postService.write(rq.getMember(), form.getTitle(), form.getBody(), form.isPublished());
-
-        return rq.redirect("/post/" + post.getId(), post.getId() + "번 글이 작성되었습니다.");
-    }
-
-    @PreAuthorize("isAuthenticated()")
-    @GetMapping("/{id}/modify")
-    public String showModify(@PathVariable long id, Model model) {
+    @GetMapping("/{id}/edit")
+    public String showEdit(@PathVariable long id, Model model) {
         Post post = postService.findById(id).orElseThrow(() -> new GlobalException("404-1", "해당 글이 존재하지 않습니다."));
 
         if (!postService.canModify(rq.getMember(), post)) throw new GlobalException("403-1", "권한이 없습니다.");
 
         model.addAttribute("post", post);
 
-        return "domain/post/post/modify";
+        return "domain/post/post/edit";
     }
 
     @Getter
     @Setter
-    public static class ModifyForm {
+    public static class EditForm {
         @NotBlank
         private String title;
         @NotBlank
         private String body;
-        private boolean isPublished;
+        private boolean published;
     }
 
     @PreAuthorize("isAuthenticated()")
-    @PutMapping("/{id}/modify")
-    public String modify(@PathVariable long id, @Valid ModifyForm form) {
+    @PutMapping("/{id}/edit")
+    public String edit(@PathVariable long id, @Valid EditForm form) {
         Post post = postService.findById(id).orElseThrow(() -> new GlobalException("404-1", "해당 글이 존재하지 않습니다."));
 
         if (!postService.canModify(rq.getMember(), post)) throw new GlobalException("403-1", "권한이 없습니다.");
 
-        postService.modify(post, form.getTitle(), form.getBody(), form.isPublished());
+        postService.edit(post, form.getTitle(), form.getBody(), form.isPublished());
 
         return rq.redirect("/post/" + post.getId(), post.getId() + "번 글이 수정되었습니다.");
     }

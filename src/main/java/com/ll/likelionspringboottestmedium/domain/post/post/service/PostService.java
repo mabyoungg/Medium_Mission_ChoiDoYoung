@@ -22,19 +22,19 @@ public class PostService {
     private final PostCommentRepository postCommentRepository;
 
     @Transactional
-    public Post write(Member author, String title, String body, boolean isPublished) {
+    public Post write(Member author, String title, String body, boolean published) {
         Post post = Post.builder()
                 .author(author)
                 .title(title)
                 .body(body)
-                .isPublished(isPublished)
+                .published(published)
                 .build();
 
         return postRepository.save(post);
     }
 
-    public List<Post> findTop30ByIsPublishedOrderByIdDesc(boolean isPublished) {
-        return postRepository.findTop30ByIsPublishedOrderByIdDesc(isPublished);
+    public List<Post> findTop30ByPublishedOrderByIdDesc(boolean published) {
+        return postRepository.findTop30ByPublishedOrderByIdDesc(published);
     }
 
     public Optional<Post> findById(long id) {
@@ -45,8 +45,8 @@ public class PostService {
         return postRepository.search(true, kw, pageable);
     }
 
-    public Page<Post> search(Member author, Boolean isPublished, String kw, Pageable pageable) {
-        return postRepository.search(author, isPublished, kw, pageable);
+    public Page<Post> search(Member author, Boolean published, String kw, Pageable pageable) {
+        return postRepository.search(author, published, kw, pageable);
     }
 
     public boolean canLike(Member actor, Post post) {
@@ -76,7 +76,7 @@ public class PostService {
     }
 
     @Transactional
-    public void modify(Post post, String title, String body, boolean published) {
+    public void edit(Post post, String title, String body, boolean published) {
         post.setTitle(title);
         post.setBody(body);
         post.setPublished(published);
@@ -133,5 +133,10 @@ public class PostService {
     @Transactional
     public void deleteComment(PostComment postComment) {
         postCommentRepository.delete(postComment);
+    }
+
+    public Post findTempOrMake(Member author) {
+        return postRepository.findByAuthorAndPublishedAndTitle(author, false, "임시글")
+                .orElseGet(() -> write(author, "임시글", "", false));
     }
 }
