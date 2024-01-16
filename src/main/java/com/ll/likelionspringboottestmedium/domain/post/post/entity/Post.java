@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static jakarta.persistence.CascadeType.ALL;
+import static jakarta.persistence.FetchType.LAZY;
 import static lombok.AccessLevel.PROTECTED;
 
 @Entity
@@ -29,11 +30,15 @@ public class Post extends BaseEntity {
     @OrderBy("id DESC")
     private List<PostComment> comments = new ArrayList<>();
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = LAZY)
     private Member author;
     private String title;
     @Column(columnDefinition = "TEXT")
     private String body;
+
+    @ManyToOne(fetch = LAZY)
+    private PostDetail detailBody;
+
     private boolean published;
     @Setter(PROTECTED)
     private long hit;

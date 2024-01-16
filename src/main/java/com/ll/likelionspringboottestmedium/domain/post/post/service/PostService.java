@@ -2,6 +2,8 @@ package com.ll.likelionspringboottestmedium.domain.post.post.service;
 
 import com.ll.likelionspringboottestmedium.domain.memeber.memeber.entity.Member;
 import com.ll.likelionspringboottestmedium.domain.post.post.entity.Post;
+import com.ll.likelionspringboottestmedium.domain.post.post.entity.PostDetail;
+import com.ll.likelionspringboottestmedium.domain.post.post.repository.PostDetailRepository;
 import com.ll.likelionspringboottestmedium.domain.post.post.repository.PostRepository;
 import com.ll.likelionspringboottestmedium.domain.post.postComment.entity.PostComment;
 import com.ll.likelionspringboottestmedium.domain.post.postComment.service.PostCommentRepository;
@@ -19,6 +21,7 @@ import java.util.Optional;
 @Transactional(readOnly = true)
 public class PostService {
     private final PostRepository postRepository;
+    private final PostDetailRepository postDetailRepository;
     private final PostCommentRepository postCommentRepository;
 
     @Transactional
@@ -26,11 +29,14 @@ public class PostService {
         Post post = Post.builder()
                 .author(author)
                 .title(title)
-                .body(body)
                 .published(published)
                 .build();
 
-        return postRepository.save(post);
+        postRepository.save(post);
+
+        saveBody(post, body);
+
+        return post;
     }
 
     public List<Post> findTop30ByPublishedOrderByIdDesc(boolean published) {
@@ -78,13 +84,34 @@ public class PostService {
     @Transactional
     public void edit(Post post, String title, String body, boolean published, int minMembershipLevel) {
         post.setTitle(title);
-        post.setBody(body);
         post.setPublished(published);
         post.setMinMembershipLevel(minMembershipLevel);
+
+        saveBody(post, body);
+    }
+
+    private void saveBody(Post post, String body) {
+        PostDetail detailBody = findDetail(post, "common__body");
+        detailBody.setVal(body);
+        post.setDetailBody(detailBody);
+    }
+
+    private PostDetail findDetail(Post post, String name) {
+        Optional<PostDetail> opDetailBody  = postDetailRepository.findByPostAndName(post, name);
+
+        PostDetail detailBody = opDetailBody.orElseGet(() -> postDetailRepository.save(
+                PostDetail.builder()
+                        .post(post)
+                        .name(name)
+                        .build()
+        ));
+
+        return detailBody;
     }
 
     @Transactional
     public void delete(Post post) {
+        postDetailRepository.deleteByPost(post);
         postRepository.delete(post);
     }
 
