@@ -76,10 +76,11 @@ public class PostService {
     }
 
     @Transactional
-    public void edit(Post post, String title, String body, boolean published) {
+    public void edit(Post post, String title, String body, boolean published, int minMembershipLevel) {
         post.setTitle(title);
         post.setBody(body);
         post.setPublished(published);
+        post.setMinMembershipLevel(minMembershipLevel);
     }
 
     @Transactional
