@@ -26,10 +26,16 @@ public class PostService {
 
     @Transactional
     public Post write(Member author, String title, String body, boolean published) {
+        return write(author, title, body, published, 0);
+    }
+
+    @Transactional
+    public Post write(Member author, String title, String body, boolean published, int minMembershipLevel) {
         Post post = Post.builder()
                 .author(author)
                 .title(title)
                 .published(published)
+                .minMembershipLevel(minMembershipLevel)
                 .build();
 
         postRepository.save(post);
