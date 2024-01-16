@@ -14,8 +14,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.annotation.RequestScope;
 
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 
 @Component
@@ -30,15 +28,24 @@ public class Rq {
     public String redirect(String url, String msg) {
         String[] urlBits = url.split("#", 2);
         url = urlBits[0];
-        msg = URLEncoder.encode(msg, StandardCharsets.UTF_8);
 
         StringBuilder sb = new StringBuilder();
 
         sb.append("redirect:");
+
+        url = Ut.url.deleteQueryParam(url, "msg");
+
         sb.append(url);
 
-        if (msg != null) {
-            sb.append("?msg=");
+        if (Ut.str.hasLength(msg)) {
+            msg = Ut.url.encode(msg);
+
+            if (url.contains("?")) {
+                sb.append("&msg=");
+            } else {
+                sb.append("?msg=");
+            }
+
             sb.append(msg);
         }
 
@@ -112,5 +119,20 @@ public class Rq {
         }
 
         return member;
+    }
+
+    public String getEncodedCurrentUrl() {
+        return Ut.url.encode(getCurrentUrl());
+    }
+
+    private String getCurrentUrl() {
+        String url = request.getRequestURI();
+        String queryString = request.getQueryString();
+
+        if (queryString != null) {
+            url += "?" + queryString;
+        }
+
+        return url;
     }
 }
