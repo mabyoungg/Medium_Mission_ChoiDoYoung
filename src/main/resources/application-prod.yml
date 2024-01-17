@@ -23,6 +23,6 @@ logging:
 custom:
   tempDirPath: /gen/temp
   site:
-    baseUrl: "https://test.com"
+    baseUrl: "https://test-medium.oa.gg"
   genFile:
     dirPath: /gen

@@ -1,6 +1,7 @@
 package com.ll.likelionspringboottestmedium.global.rq;
 
 import com.ll.likelionspringboottestmedium.domain.memeber.memeber.entity.Member;
+import com.ll.likelionspringboottestmedium.domain.memeber.memeber.service.MemberService;
 import com.ll.likelionspringboottestmedium.global.rsData.RsData;
 import com.ll.likelionspringboottestmedium.global.security.SecurityUser;
 import com.ll.likelionspringboottestmedium.standard.util.Ut.Ut;
@@ -20,6 +21,7 @@ import java.util.Optional;
 @RequestScope
 @RequiredArgsConstructor
 public class Rq {
+    private final MemberService memberService;
     private final HttpServletRequest request;
     private final HttpServletResponse response;
     private final EntityManager entityManager;
@@ -134,5 +136,9 @@ public class Rq {
         }
 
         return url;
+    }
+
+    public String getProfileImgUrl() {
+        return memberService.getProfileImgUrl(getMember());
     }
 }
