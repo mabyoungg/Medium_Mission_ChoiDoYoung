@@ -1,5 +1,7 @@
 package com.ll.likelionspringboottestmedium.domain.post.post.service;
 
+import com.ll.likelionspringboottestmedium.domain.base.genFile.entity.GenFile;
+import com.ll.likelionspringboottestmedium.domain.base.genFile.service.GenFileService;
 import com.ll.likelionspringboottestmedium.domain.memeber.memeber.entity.Member;
 import com.ll.likelionspringboottestmedium.domain.post.post.entity.Post;
 import com.ll.likelionspringboottestmedium.domain.post.post.entity.PostDetail;
@@ -23,6 +25,7 @@ public class PostService {
     private final PostRepository postRepository;
     private final PostDetailRepository postDetailRepository;
     private final PostCommentRepository postCommentRepository;
+    private final GenFileService genFileService;
 
     @Transactional
     public Post write(Member author, String title, String body, boolean published) {
@@ -138,8 +141,14 @@ public class PostService {
         return detailBody;
     }
 
+    private List<GenFile> findGenFiles(Post post) {
+        return genFileService.findByRelId(post.getModelName(), post.getId());
+    }
+
     @Transactional
     public void delete(Post post) {
+        findGenFiles(post).forEach(genFileService::remove);
+
         postDetailRepository.deleteByPost(post);
         postRepository.delete(post);
     }
