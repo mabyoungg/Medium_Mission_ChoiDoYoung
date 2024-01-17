@@ -79,4 +79,10 @@ public class Post extends BaseEntity {
 
         return postComment;
     }
+
+    public String getBodyForEditor() {
+        return getDetailBody()
+                .getVal()
+                .replaceAll("(?i)(</?)script", "$1t-script");
+    }
 }
