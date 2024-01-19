@@ -201,6 +201,7 @@ public class PostService {
         postCommentRepository.delete(postComment);
     }
 
+    @Transactional
     public Post findTempOrMake(Member author) {
         return postRepository.findByAuthorAndPublishedAndTitle(author, false, "임시글")
                 .orElseGet(() -> write(author, "임시글", "", false));
