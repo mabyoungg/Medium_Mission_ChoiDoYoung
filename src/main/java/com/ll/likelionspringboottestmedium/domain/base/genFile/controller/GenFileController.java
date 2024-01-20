@@ -59,8 +59,6 @@ public class GenFileController {
         String type2Code = null;
         long fileNo = 0;
 
-        System.out.println("referer : " + rq.getReferer());
-
         if (refererUrl.startsWith("/post/") && refererUrl.contains("/edit")) {
             relTypeCode = "post";
             relId = Long.parseLong(

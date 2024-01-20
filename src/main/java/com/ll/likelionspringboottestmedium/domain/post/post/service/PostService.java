@@ -6,9 +6,11 @@ import com.ll.likelionspringboottestmedium.domain.memeber.memeber.entity.Member;
 import com.ll.likelionspringboottestmedium.domain.post.post.entity.Post;
 import com.ll.likelionspringboottestmedium.domain.post.post.entity.PostDetail;
 import com.ll.likelionspringboottestmedium.domain.post.post.repository.PostDetailRepository;
+import com.ll.likelionspringboottestmedium.domain.post.postLike.repository.PostLikeRepository;
 import com.ll.likelionspringboottestmedium.domain.post.post.repository.PostRepository;
 import com.ll.likelionspringboottestmedium.domain.post.postComment.entity.PostComment;
 import com.ll.likelionspringboottestmedium.domain.post.postComment.service.PostCommentRepository;
+import com.ll.likelionspringboottestmedium.domain.post.postLike.entity.PostLike;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -24,6 +26,7 @@ import java.util.Optional;
 public class PostService {
     private final PostRepository postRepository;
     private final PostDetailRepository postDetailRepository;
+    private final PostLikeRepository postLikeRepository;
     private final PostCommentRepository postCommentRepository;
     private final GenFileService genFileService;
 
@@ -205,5 +208,9 @@ public class PostService {
     public Post findTempOrMake(Member author) {
         return postRepository.findByAuthorAndPublishedAndTitle(author, false, "임시글")
                 .orElseGet(() -> write(author, "임시글", "", false));
+    }
+
+    public List<PostLike> findLikesByPostInAndMember(List<Post> posts, Member member) {
+        return postLikeRepository.findByPostInAndMember(posts, member);
     }
 }

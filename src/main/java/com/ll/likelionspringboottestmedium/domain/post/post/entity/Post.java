@@ -20,14 +20,17 @@ import static lombok.AccessLevel.PROTECTED;
 @Builder
 @Getter
 @Setter
+@ToString(callSuper = true)
 public class Post extends BaseEntity {
     @OneToMany(mappedBy = "post", cascade = ALL, orphanRemoval = true)
     @Builder.Default
+    @ToString.Exclude
     private List<PostLike> likes = new ArrayList<>();
 
     @OneToMany(mappedBy = "post", cascade = ALL, orphanRemoval = true)
     @Builder.Default
     @OrderBy("id DESC")
+    @ToString.Exclude
     private List<PostComment> comments = new ArrayList<>();
 
     @ManyToOne(fetch = LAZY)
@@ -37,6 +40,7 @@ public class Post extends BaseEntity {
     private String body;
 
     @ManyToOne(fetch = LAZY)
+    @ToString.Exclude
     private PostDetail detailBody;
 
     private boolean published;
