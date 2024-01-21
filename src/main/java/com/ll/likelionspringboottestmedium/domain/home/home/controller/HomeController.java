@@ -25,18 +25,18 @@ public class HomeController {
         if (rq.isLogin()) {
             List<PostLike> likes = postService.findLikesByPostInAndMember(posts, rq.getMember());
 
-            Map<Post, PostLike> likeMap = likes
+            Map<Long, Boolean> likeMap = likes
                     .stream()
                     .collect(
                             HashMap::new,
-                            (map, like) -> map.put(like.getPost(), like),
+                            (map, like) -> map.put(like.getPost().getId(), true),
                             HashMap::putAll
                     );
 
-            System.out.println(likeMap);
+            rq.attr("likeMap", likeMap);
         }
 
-        rq.setAttribute("posts", posts);
+        rq.attr("posts", posts);
 
         return "domain/home/home/main";
     }

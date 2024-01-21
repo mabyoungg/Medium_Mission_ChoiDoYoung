@@ -35,7 +35,7 @@ public class PostController {
         if ( postService.canRead(rq.getMember(), post) )
             postService.increaseHit(post);
 
-        rq.setAttribute("post", post);
+        rq.attr("post", post);
 
         return "domain/post/post/detail";
     }
@@ -50,8 +50,8 @@ public class PostController {
         Pageable pageable = PageRequest.of(page - 1, 10, Sort.by(sorts));
 
         Page<Post> postPage = postService.search(kw, pageable);
-        rq.setAttribute("postPage", postPage);
-        rq.setAttribute("page", page);
+        rq.attr("postPage", postPage);
+        rq.attr("page", page);
 
         return "domain/post/post/list";
     }
@@ -67,8 +67,8 @@ public class PostController {
         Pageable pageable = PageRequest.of(page - 1, 10, Sort.by(sorts));
 
         Page<Post> postPage = postService.search(rq.getMember(), null, kw, pageable);
-        rq.setAttribute("postPage", postPage);
-        rq.setAttribute("page", page);
+        rq.attr("postPage", postPage);
+        rq.attr("page", page);
 
         return "domain/post/post/myList";
     }
