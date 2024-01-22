@@ -18,6 +18,7 @@
     <div th:text="${post.author.username}">작성자</div>
     <div th:text="${post.createDate}">작성일</div>
     <div th:text="${post.minMembershipLevel}">레벨</div>
+    <div th:text="${post.hit}">조회수</div>
 
     <div class="flex gap-2 mt-4">
         <a th:if="${@postService.canLike(@rq.member, post)}"
