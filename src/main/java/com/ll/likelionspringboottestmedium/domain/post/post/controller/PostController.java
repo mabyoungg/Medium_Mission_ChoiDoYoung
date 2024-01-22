@@ -20,6 +20,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/post")
@@ -42,6 +44,7 @@ public class PostController {
 
     @GetMapping("/list")
     public String showList(
+            @RequestParam(value = "kwType", defaultValue = "title,body") List<String> kwTypes,
             @RequestParam(defaultValue = "") String kw,
             @RequestParam(defaultValue = "1") int page
     ) {
@@ -49,7 +52,7 @@ public class PostController {
         sorts.add(Sort.Order.desc("id"));
         Pageable pageable = PageRequest.of(page - 1, 10, Sort.by(sorts));
 
-        Page<Post> postPage = postService.search(kw, pageable);
+        Page<Post> postPage = postService.search(kwTypes, kw, pageable);
 
         if (rq.isLogin()) {
             postService.loadLikeMapOnRequestScope(postPage.getContent(), rq.getMember());
@@ -57,6 +60,14 @@ public class PostController {
 
         rq.attr("postPage", postPage);
         rq.attr("page", page);
+
+        Map<String, Boolean> kwTypesMap = kwTypes
+                .stream()
+                .collect(Collectors.toMap(
+                        kwType -> kwType,
+                        kwType -> true
+                ));
+        rq.attr("kwTypesMap", kwTypesMap);
 
         return "domain/post/post/list";
     }
