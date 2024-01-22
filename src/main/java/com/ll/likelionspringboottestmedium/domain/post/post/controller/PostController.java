@@ -50,6 +50,11 @@ public class PostController {
         Pageable pageable = PageRequest.of(page - 1, 10, Sort.by(sorts));
 
         Page<Post> postPage = postService.search(kw, pageable);
+
+        if (rq.isLogin()) {
+            postService.loadLikeMapOnRequestScope(postPage.getContent(), rq.getMember());
+        }
+
         rq.attr("postPage", postPage);
         rq.attr("page", page);
 
@@ -67,6 +72,11 @@ public class PostController {
         Pageable pageable = PageRequest.of(page - 1, 10, Sort.by(sorts));
 
         Page<Post> postPage = postService.search(rq.getMember(), null, kw, pageable);
+
+        if (rq.isLogin()) {
+            postService.loadLikeMapOnRequestScope(postPage.getContent(), rq.getMember());
+        }
+
         rq.attr("postPage", postPage);
         rq.attr("page", page);
 

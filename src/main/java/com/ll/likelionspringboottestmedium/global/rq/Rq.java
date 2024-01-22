@@ -145,4 +145,8 @@ public class Rq {
     public String getReferer() {
         return request.getHeader("referer");
     }
+
+    public <T> T attr(String name) {
+        return (T) request.getAttribute(name);
+    }
 }
