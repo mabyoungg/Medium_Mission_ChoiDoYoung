@@ -54,6 +54,8 @@ public class PostController {
             case "idAsc" -> List.of(Sort.Order.asc("id"));
             case "hitDesc" -> List.of(Sort.Order.desc("hit"));
             case "hitAsc" -> List.of(Sort.Order.asc("hit"));
+            case "likesCountDesc" -> List.of(Sort.Order.desc("likesCount"));
+            case "likesCountAsc" -> List.of(Sort.Order.asc("likesCount"));
             default -> throw new GlobalException("404-1", "존재하지 않는 정렬코드입니다.");
         };
 

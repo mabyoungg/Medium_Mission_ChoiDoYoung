@@ -36,17 +36,29 @@ public class Post extends BaseEntity {
     @ManyToOne(fetch = LAZY)
     private Member author;
     private String title;
-    @Column(columnDefinition = "TEXT")
-    private String body;
 
     @ManyToOne(fetch = LAZY)
     @ToString.Exclude
     private PostDetail detailBody;
 
     private boolean published;
+
     @Setter(PROTECTED)
     private long hit;
+
+    @Setter(PROTECTED)
+    private long likesCount;
+
     private int minMembershipLevel;
+
+
+    public void increaseLikesCount() {
+        likesCount++;
+    }
+
+    private void decreaseLikesCount() {
+        likesCount--;
+    }
 
     public void increaseHit() {
         hit++;
@@ -61,6 +73,8 @@ public class Post extends BaseEntity {
                 .post(this)
                 .member(member)
                 .build());
+
+        increaseLikesCount();
     }
 
     public boolean hasLike(Member member) {
@@ -69,7 +83,11 @@ public class Post extends BaseEntity {
     }
 
     public void deleteLike(Member member) {
-        likes.removeIf(postLike -> postLike.getMember().equals(member));
+        boolean removed = likes.removeIf(postLike -> postLike.getMember().equals(member));
+
+        if (removed) {
+            decreaseLikesCount();
+        }
     }
 
     public PostComment writeComment(Member actor, String body) {
