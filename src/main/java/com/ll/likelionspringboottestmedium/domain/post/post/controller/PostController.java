@@ -65,7 +65,7 @@ public class PostController {
         Page<Post> postPage = postService.search(kwTypes, kw, pageable);
 
         if (rq.isLogin()) {
-            postService.loadLikeMapOnRequestScope(postPage.getContent(), rq.getMember());
+            postService.loadLikeMap(postPage.getContent(), rq.getMember());
         }
 
         rq.attr("postPage", postPage);
@@ -95,7 +95,7 @@ public class PostController {
         Page<Post> postPage = postService.search(rq.getMember(), null, kw, pageable);
 
         if (rq.isLogin()) {
-            postService.loadLikeMapOnRequestScope(postPage.getContent(), rq.getMember());
+            postService.loadLikeMap(postPage.getContent(), rq.getMember());
         }
 
         rq.attr("postPage", postPage);

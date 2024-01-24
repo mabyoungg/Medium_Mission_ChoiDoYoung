@@ -6,6 +6,7 @@ import com.ll.likelionspringboottestmedium.global.rsData.RsData;
 import com.ll.likelionspringboottestmedium.global.security.SecurityUser;
 import com.ll.likelionspringboottestmedium.standard.util.Ut.Ut;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -24,7 +25,8 @@ public class Rq {
     private final MemberService memberService;
     private final HttpServletRequest request;
     private final HttpServletResponse response;
-    private final EntityManager entityManager;
+    @PersistenceContext
+    private EntityManager entityManager;
     private Member member;
 
     public String redirect(String url, String msg) {

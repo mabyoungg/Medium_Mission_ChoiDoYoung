@@ -23,7 +23,7 @@ public class HomeController {
         List<Post> posts = postService.findTop30ByPublishedOrderByIdDesc(true);
 
         if (rq.isLogin()) {
-            postService.loadLikeMapOnRequestScope(posts, rq.getMember());
+            postService.loadLikeMap(posts, rq.getMember());
         }
 
         rq.attr("posts", posts);

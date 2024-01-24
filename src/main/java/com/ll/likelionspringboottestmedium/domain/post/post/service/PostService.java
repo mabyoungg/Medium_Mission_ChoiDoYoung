@@ -11,7 +11,7 @@ import com.ll.likelionspringboottestmedium.domain.post.postComment.entity.PostCo
 import com.ll.likelionspringboottestmedium.domain.post.postComment.service.PostCommentRepository;
 import com.ll.likelionspringboottestmedium.domain.post.postLike.entity.PostLike;
 import com.ll.likelionspringboottestmedium.domain.post.postLike.repository.PostLikeRepository;
-import com.ll.likelionspringboottestmedium.global.rq.Rq;
+import com.ll.likelionspringboottestmedium.global.TransactionCache;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -32,7 +32,7 @@ public class PostService {
     private final PostLikeRepository postLikeRepository;
     private final PostCommentRepository postCommentRepository;
     private final GenFileService genFileService;
-    private final Rq rq;
+    private final TransactionCache transactionCache;
 
     @Transactional
     public Post write(Member author, String title, String body, boolean published) {
@@ -97,7 +97,7 @@ public class PostService {
 
         if (!canRead(actor, post)) return false;
 
-        Map<Long, Boolean> likeMap = rq.attr("likeMap");
+        Map<Long, Boolean> likeMap = transactionCache.get("likeMap");
         if (likeMap != null) {
             Boolean cached = likeMap.get(post.getId());
             if (cached != null) return !cached;
@@ -109,7 +109,7 @@ public class PostService {
     public boolean canCancelLike(Member actor, Post post) {
         if (actor == null) return false;
 
-        Map<Long, Boolean> likeMap = rq.attr("likeMap");
+        Map<Long, Boolean> likeMap = transactionCache.get("likeMap");
         if (likeMap != null) {
             Boolean cached = likeMap.get(post.getId());
             if (cached != null) return cached;
@@ -230,8 +230,8 @@ public class PostService {
         return postLikeRepository.findByPostInAndMember(posts, member);
     }
 
-    public void loadLikeMapOnRequestScope(List<Post> posts, Member member) {
-        List<PostLike> likes = findLikesByPostInAndMember(posts, rq.getMember());
+    public void loadLikeMap(List<Post> posts, Member member) {
+        List<PostLike> likes = findLikesByPostInAndMember(posts, member);
 
         Map<Long, Boolean> likeMap_ = likes
                 .stream()
@@ -249,6 +249,6 @@ public class PostService {
                         HashMap::putAll
                 );
 
-        rq.attr("likeMap", likeMap);
+        transactionCache.put("likeMap", likeMap);
     }
 }
