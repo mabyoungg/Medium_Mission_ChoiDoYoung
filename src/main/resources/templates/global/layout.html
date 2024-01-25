@@ -19,14 +19,20 @@
         const urlParams = getUrlParams(location.href);
     </script>
 </head>
-<body class="p-5">
+<body class="min-h-[100dvh] flex flex-col">
 
 <link href="https://cdn.jsdelivr.net/npm/daisyui@4.5.0/dist/full.min.css" rel="stylesheet" type="text/css" />
 <script src="https://cdn.tailwindcss.com"></script>
 
-<th:block layout:fragment="header"></th:block>
+<header layout:fragment="header" class="flex gap-2"></header>
 
-<th:block layout:fragment="content"></th:block>
+<main class="flex-1">
+    <th:block layout:fragment="content"></th:block>
+</main>
+
+<footer>
+    MEDIUM CLONE.
+</footer>
 
 <script>
     // history.back 에 의해서 돌아온 경우에 자바스크립트가 실행이 안될 수 도 잇다.

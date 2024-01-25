@@ -25,7 +25,7 @@ public class TransactionCache {
     public <T> void put(String name, T value) {
         HashMap<String, Object> map = (HashMap<String, Object>) cache.getOrDefault(entityManager.getDelegate(), new HashMap<>());
 
-        if (map.size() == 0) cache.put(entityManager.getDelegate(), map);
+        if (map.isEmpty()) cache.put(entityManager.getDelegate(), map);
 
         map.put(name, value);
     }
