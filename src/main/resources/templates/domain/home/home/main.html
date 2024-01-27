@@ -5,11 +5,12 @@
 </head>
 
 <div layout:fragment="content">
-    <h1>메인</h1>
+    <h1 class="mb-4">
+        <i class="fa-solid fa-list"></i>
+        최신 글
+    </h1>
 
-    <h2>최신 게시물</h2>
-
-    <ul>
+    <ul class="grid grid-cols-1 gap-4">
         <li th:each="post : ${posts}">
             <th:block th:replace="~{domain/post/post/fragments/postListItem :: postListItem(${post})}"/>
         </li>

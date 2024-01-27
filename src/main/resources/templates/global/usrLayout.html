@@ -26,8 +26,7 @@
         </div>
     </div>
     <div class="flex-1">
-        <a class="btn btn-ghost text-xl" th:text="|${@appConfig.siteName}|">
-        </a>
+        <a class="btn btn-ghost text-xl" href="/" th:text="|${@appConfig.siteName}|"></a>
     </div>
     <div class="flex-none">
         <a th:if="${@rq.login}" href="/member/me" class="btn btn-ghost btn-circle">
