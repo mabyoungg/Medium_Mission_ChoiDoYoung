@@ -6,7 +6,10 @@
 
 <body>
 <div layout:fragment="content">
-    <h1>회원가입</h1>
+    <h1 class="mb-4">
+        <i class="fa-solid fa-user-plus"></i>
+        회원가입
+    </h1>
 
     <script>
         function submitJoinForm(form) {
@@ -44,23 +47,43 @@
         }
     </script>
 
-    <form th:action method="POST" onsubmit="submitJoinForm(this); return false;">
-        <div>
-            <label>사용자 ID</label>
-            <input type="text" name="username">
+    <form class="flex flex-col gap-6" th:action method="POST" onsubmit="submitJoinForm(this); return false;">
+        <label class="form-control">
+            <div class="label">
+                <span class="label-text">아이디</span>
+            </div>
+
+            <input type="text" name="username" placeholder="아이디" class="input input-bordered">
+        </label>
+
+        <label class="form-control">
+            <div class="label">
+                <span class="label-text">비밀번호</span>
+            </div>
+
+            <input type="password" name="password" placeholder="비밀번호" class="input input-bordered">
+        </label>
+
+        <label class="form-control">
+            <div class="label">
+                <span class="label-text">비밀번호 확인</span>
+            </div>
+
+            <input type="password" name="passwordConfirm" placeholder="비밀번호 확인" class="input input-bordered">
+        </label>
+
+        <div class="flex flex-col gap-2">
+            <button class="btn btn-block btn-primary">
+                <i class="fa-solid fa-user-plus"></i>
+                <span>회원가입</span>
+            </button>
         </div>
 
-        <div>
-            <label>비밀번호</label>
-            <input type="password" name="password">
+        <div class="text-center">
+            <a class="btn btn-link" href="/member/login">로그인</a>
+            <a class="btn btn-link" href="/member/findUsername">아이디 찾기</a>
+            <a class="btn btn-link" href="/member/findPassword">비밀번호 찾기</a>
         </div>
-
-        <div>
-            <label>비밀번호 확인</label>
-            <input type="password" name="passwordConfirm">
-        </div>
-
-        <button type="submit">회원가입</button>
     </form>
 </div>
 </body>
