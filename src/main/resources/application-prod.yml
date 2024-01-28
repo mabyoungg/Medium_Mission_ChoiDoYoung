@@ -6,10 +6,15 @@ spring:
       max-file-size: 5MB
       max-request-size: 5MB
   datasource:
-    url: jdbc:mysql://172.17.0.1:3306/medium_prod
-    username: lldjlocal
-    password: 1234
-    driver-class-name: com.mysql.cj.jdbc.Driver
+#    url: jdbc:mysql://172.17.0.1:3306/medium_prod
+#    username: lldjlocal
+#    password: 1234
+#    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:h2:./db_dev;MODE=MYSQL
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+
   jpa:
     hibernate:
       ddl-auto: update
@@ -23,6 +28,6 @@ logging:
 custom:
   tempDirPath: /gen/temp
   site:
-    baseUrl: "https://test-medium.oa.gg"
+    baseUrl: "https://techit.kro.kr"
   genFile:
     dirPath: /gen
