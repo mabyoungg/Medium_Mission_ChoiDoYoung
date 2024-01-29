@@ -8,7 +8,6 @@ import com.ll.likelionspringboottestmedium.global.app.AppConfig;
 import com.ll.likelionspringboottestmedium.global.rsData.RsData;
 import com.ll.likelionspringboottestmedium.standard.util.Ut.Ut;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.annotation.Profile;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -18,7 +17,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Optional;
 
 @Service
-@Profile("!prod")
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class MemberService {
