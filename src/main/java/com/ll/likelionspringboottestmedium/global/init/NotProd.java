@@ -12,12 +12,14 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.context.annotation.Profile;
 import org.springframework.core.annotation.Order;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.stream.IntStream;
 
 @Configuration
+@Profile("!prod")
 @Slf4j
 @RequiredArgsConstructor
 public class NotProd {

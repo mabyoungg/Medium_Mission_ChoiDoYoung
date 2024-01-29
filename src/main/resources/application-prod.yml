@@ -26,7 +26,7 @@ logging:
     org.hibernate.orm.jdbc.extract: INFO
     org.springframework.transaction.interceptor: INFO
 custom:
-  tempDirPath: /gen/temp
+  tempDirPath: /tmp
   site:
     baseUrl: "https://techit.kro.kr"
   genFile:
