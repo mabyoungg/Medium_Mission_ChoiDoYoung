@@ -15,3 +15,8 @@ html > body {
     font-family: var(--base-font-family);
     text-wrap: none;
 }
+
+/* 토스틀 */
+html > body #toast-container .toast {
+    white-space: normal;
+}

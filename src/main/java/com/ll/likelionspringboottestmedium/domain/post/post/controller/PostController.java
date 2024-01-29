@@ -20,6 +20,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/post")
@@ -32,25 +34,50 @@ public class PostController {
     public String showDetail(@PathVariable long id) {
         Post post = postService.findById(id).orElseThrow(() -> new GlobalException("404-1", "해당 글이 존재하지 않습니다."));
 
-        postService.increaseHit(post);
+        if ( postService.canRead(rq.getMember(), post) )
+            postService.increaseHit(post);
 
-        rq.setAttribute("post", post);
+        rq.attr("post", post);
 
         return "domain/post/post/detail";
     }
 
     @GetMapping("/list")
     public String showList(
+            @RequestParam(value = "kwType", defaultValue = "title,body") List<String> kwTypes,
             @RequestParam(defaultValue = "") String kw,
-            @RequestParam(defaultValue = "1") int page
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "idDesc") String sortCode
     ) {
-        List<Sort.Order> sorts = new ArrayList<>();
-        sorts.add(Sort.Order.desc("id"));
+        List<Sort.Order> sorts = switch (sortCode) {
+            case "idDesc" -> List.of(Sort.Order.desc("id"));
+            case "idAsc" -> List.of(Sort.Order.asc("id"));
+            case "hitDesc" -> List.of(Sort.Order.desc("hit"));
+            case "hitAsc" -> List.of(Sort.Order.asc("hit"));
+            case "likesCountDesc" -> List.of(Sort.Order.desc("likesCount"));
+            case "likesCountAsc" -> List.of(Sort.Order.asc("likesCount"));
+            default -> throw new GlobalException("404-1", "존재하지 않는 정렬코드입니다.");
+        };
+
+
         Pageable pageable = PageRequest.of(page - 1, 10, Sort.by(sorts));
 
-        Page<Post> postPage = postService.search(kw, pageable);
-        rq.setAttribute("postPage", postPage);
-        rq.setAttribute("page", page);
+        Page<Post> postPage = postService.search(kwTypes, kw, pageable);
+
+        if (rq.isLogin()) {
+            postService.loadLikeMap(postPage.getContent(), rq.getMember());
+        }
+
+        rq.attr("postPage", postPage);
+        rq.attr("page", page);
+
+        Map<String, Boolean> kwTypesMap = kwTypes
+                .stream()
+                .collect(Collectors.toMap(
+                        kwType -> kwType,
+                        kwType -> true
+                ));
+        rq.attr("kwTypesMap", kwTypesMap);
 
         return "domain/post/post/list";
     }
@@ -66,103 +93,114 @@ public class PostController {
         Pageable pageable = PageRequest.of(page - 1, 10, Sort.by(sorts));
 
         Page<Post> postPage = postService.search(rq.getMember(), null, kw, pageable);
-        rq.setAttribute("postPage", postPage);
-        rq.setAttribute("page", page);
+
+        if (rq.isLogin()) {
+            postService.loadLikeMap(postPage.getContent(), rq.getMember());
+        }
+
+        rq.attr("postPage", postPage);
+        rq.attr("page", page);
 
         return "domain/post/post/myList";
     }
 
     @PreAuthorize("isAuthenticated()")
-    @GetMapping("/write")
-    public String showWrite() {
-        return "domain/post/post/write";
-    }
+    @PostMapping("/makeTemp")
+    public String makeTemp() {
+        Post post = postService.findTempOrMake(rq.getMember());
 
-    @Getter
-    @Setter
-    public static class WriteForm {
-        @NotBlank
-        private String title;
-        @NotBlank
-        private String body;
-        private boolean isPublished;
+
+        return rq.redirect("/post/%d/edit".formatted(post.getId()), post.getId() + "번 임시글이 생성되었습니다.");
     }
 
     @PreAuthorize("isAuthenticated()")
-    @PostMapping("/write")
-    public String write(@Valid WriteForm form) {
-        Post post = postService.write(rq.getMember(), form.getTitle(), form.getBody(), form.isPublished());
-
-        return rq.redirect("/post/" + post.getId(), post.getId() + "번 글이 작성되었습니다.");
-    }
-
-    @PreAuthorize("isAuthenticated()")
-    @GetMapping("/{id}/modify")
-    public String showModify(@PathVariable long id, Model model) {
+    @GetMapping("/{id}/edit")
+    public String showEdit(@PathVariable long id, Model model) {
         Post post = postService.findById(id).orElseThrow(() -> new GlobalException("404-1", "해당 글이 존재하지 않습니다."));
 
         if (!postService.canModify(rq.getMember(), post)) throw new GlobalException("403-1", "권한이 없습니다.");
 
         model.addAttribute("post", post);
 
-        return "domain/post/post/modify";
+        return "domain/post/post/edit";
     }
 
     @Getter
     @Setter
-    public static class ModifyForm {
+    public static class EditForm {
         @NotBlank
         private String title;
         @NotBlank
         private String body;
-        private boolean isPublished;
+        private boolean published;
+        private int minMembershipLevel;
     }
 
     @PreAuthorize("isAuthenticated()")
-    @PutMapping("/{id}/modify")
-    public String modify(@PathVariable long id, @Valid ModifyForm form) {
+    @PutMapping("/{id}/edit")
+    public String edit(@PathVariable long id, @Valid EditForm form) {
         Post post = postService.findById(id).orElseThrow(() -> new GlobalException("404-1", "해당 글이 존재하지 않습니다."));
 
         if (!postService.canModify(rq.getMember(), post)) throw new GlobalException("403-1", "권한이 없습니다.");
 
-        postService.modify(post, form.getTitle(), form.getBody(), form.isPublished());
+        postService.edit(
+                post,
+                form.getTitle(),
+                form.getBody(),
+                form.isPublished(),
+                form.getMinMembershipLevel()
+        );
 
         return rq.redirect("/post/" + post.getId(), post.getId() + "번 글이 수정되었습니다.");
     }
 
     @PreAuthorize("isAuthenticated()")
     @DeleteMapping("/{id}/delete")
-    public String delete(@PathVariable long id) {
+    public String delete(
+            @PathVariable long id,
+            String redirectUrl
+    ) {
+        if (redirectUrl == null) redirectUrl = "/post/list";
         Post post = postService.findById(id).orElseThrow(() -> new GlobalException("404-1", "해당 글이 존재하지 않습니다."));
 
         if (!postService.canDelete(rq.getMember(), post)) throw new GlobalException("403-1", "권한이 없습니다.");
 
         postService.delete(post);
 
-        return rq.redirect("/post/list", post.getId() + "번 글이 삭제되었습니다.");
+        return rq.redirect(redirectUrl, post.getId() + "번 글이 삭제되었습니다.");
     }
 
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/{id}/like")
-    public String like(@PathVariable long id) {
+    public String like(
+            @PathVariable long id,
+            String redirectUrl
+    ) {
+        if (redirectUrl == null) redirectUrl = "/post/" + id;
+
         Post post = postService.findById(id).orElseThrow(() -> new GlobalException("404-1", "해당 글이 존재하지 않습니다."));
 
         if (!postService.canLike(rq.getMember(), post)) throw new GlobalException("403-1", "권한이 없습니다.");
 
         postService.like(rq.getMember(), post);
 
-        return rq.redirect("/post/" + post.getId(), post.getId() + "번 글을 추천하였습니다.");
+        return rq.redirect(redirectUrl, post.getId() + "번 글을 추천하였습니다.");
     }
 
     @PreAuthorize("isAuthenticated()")
     @DeleteMapping("/{id}/cancelLike")
-    public String cancelLike(@PathVariable long id) {
+    public String cancelLike(
+            @PathVariable long id,
+            String redirectUrl
+    ) {
+        if (redirectUrl == null) redirectUrl = "/post/" + id;
+
         Post post = postService.findById(id).orElseThrow(() -> new GlobalException("404-1", "해당 글이 존재하지 않습니다."));
 
         if (!postService.canCancelLike(rq.getMember(), post)) throw new GlobalException("403-1", "권한이 없습니다.");
 
         postService.cancelLike(rq.getMember(), post);
 
-        return rq.redirect("/post/" + post.getId(), post.getId() + "번 글을 추천취소하였습니다.");
+        return rq.redirect(redirectUrl, post.getId() + "번 글을 추천취소하였습니다.");
     }
 }

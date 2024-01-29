@@ -1,10 +1,12 @@
 package com.ll.likelionspringboottestmedium.global.rq;
 
 import com.ll.likelionspringboottestmedium.domain.memeber.memeber.entity.Member;
+import com.ll.likelionspringboottestmedium.domain.memeber.memeber.service.MemberService;
 import com.ll.likelionspringboottestmedium.global.rsData.RsData;
 import com.ll.likelionspringboottestmedium.global.security.SecurityUser;
 import com.ll.likelionspringboottestmedium.standard.util.Ut.Ut;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -14,31 +16,40 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.annotation.RequestScope;
 
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 
 @Component
 @RequestScope
 @RequiredArgsConstructor
 public class Rq {
+    private final MemberService memberService;
     private final HttpServletRequest request;
     private final HttpServletResponse response;
-    private final EntityManager entityManager;
+    @PersistenceContext
+    private EntityManager entityManager;
     private Member member;
 
     public String redirect(String url, String msg) {
         String[] urlBits = url.split("#", 2);
         url = urlBits[0];
-        msg = URLEncoder.encode(msg, StandardCharsets.UTF_8);
 
         StringBuilder sb = new StringBuilder();
 
         sb.append("redirect:");
+
+        url = Ut.url.deleteQueryParam(url, "msg");
+
         sb.append(url);
 
-        if (msg != null) {
-            sb.append("?msg=");
+        if (Ut.str.hasLength(msg)) {
+            msg = Ut.url.encode(msg);
+
+            if (url.contains("?")) {
+                sb.append("&msg=");
+            } else {
+                sb.append("?msg=");
+            }
+
             sb.append(msg);
         }
 
@@ -88,7 +99,7 @@ public class Rq {
                 .anyMatch(it -> it.getAuthority().equals("ROLE_ADMIN"));
     }
 
-    public void setAttribute(String key, Object value) {
+    public void attr(String key, Object value) {
         request.setAttribute(key, value);
     }
 
@@ -112,5 +123,32 @@ public class Rq {
         }
 
         return member;
+    }
+
+    public String getEncodedCurrentUrl() {
+        return Ut.url.encode(getCurrentUrl());
+    }
+
+    private String getCurrentUrl() {
+        String url = request.getRequestURI();
+        String queryString = request.getQueryString();
+
+        if (queryString != null) {
+            url += "?" + queryString;
+        }
+
+        return url;
+    }
+
+    public String getProfileImgUrl() {
+        return memberService.getProfileImgUrl(getMember());
+    }
+
+    public String getReferer() {
+        return request.getHeader("referer");
+    }
+
+    public <T> T attr(String name) {
+        return (T) request.getAttribute(name);
     }
 }

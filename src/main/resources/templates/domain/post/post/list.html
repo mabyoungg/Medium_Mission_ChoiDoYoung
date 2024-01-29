@@ -2,6 +2,27 @@
 
 <head>
     <title th:text="|글 목록|"></title>
+
+
+    <script>
+        function submitSearchForm(form) {
+            const kwTypeCheckboxes = form.querySelectorAll("input[name='kwType']");
+
+            const isChecked = Array.from(kwTypeCheckboxes).some(checkbox => checkbox.checked);
+
+            if (!isChecked) {
+                alert("최소한 하나의 검색 유형을 선택해야 합니다.");
+
+                if (kwTypeCheckboxes.length > 0) {
+                    kwTypeCheckboxes[0].focus();
+                }
+
+                return;
+            }
+
+            form.submit();
+        }
+    </script>
 </head>
 
 <body>
@@ -9,15 +30,37 @@
 <div layout:fragment="content">
     <h1>글 목록</h1>
 
+    <form onsubmit="submitSearchForm(this); return false;">
+        <div class="flex gap-3">
+            <label class="flex items-center gap-1"><input class="checkbox" type="checkbox" name="kwType" value="authorUsername"
+                                                          th:checked="${kwTypesMap['authorUsername']}"><span>작성자</span></label>
+            <label class="flex items-center gap-1"><input class="checkbox" type="checkbox" name="kwType" value="title"
+                                                          th:checked="${kwTypesMap['title']}"><span>제목</span></label>
+            <label class="flex items-center gap-1"><input class="checkbox" type="checkbox" name="kwType" value="body"
+                                                          th:checked="${kwTypesMap['body']}"><span>내용</span></label>
+        </div>
+        <div class="mt-3">
+            <select
+                    class="select select-bordered"
+                    name="sortCode"
+                    th:value="${param.sortCode}"
+                    onchange="submitSearchForm(this.form)"
+            >
+                <option value="idDesc">최신순</option>
+                <option value="idAsc">날짜순</option>
+                <option value="hitDesc">조회순</option>
+                <option value="hitAsc">조회역순</option>
+                <option value="likesCountDesc">추천순</option>
+                <option value="likesCountAsc">추천역순</option>
+            </select>
+        </div>
+        <input type="search" class="input input-bordered mt-3" name="kw" placeholder="검색어" th:value="${param.kw}">
+        <input type="submit" class="btn btn-primary" value="검색">
+    </form>
+
     <ul>
         <li th:each="post : ${postPage.content}">
-            <a th:href="|/post/${post.id}|">
-                <span th:text="${post.id}"></span>
-                /
-                <span th:text="${post.title}"></span>
-                /
-                <span th:text="${post.likes.size}"></span>
-            </a>
+            <th:block th:replace="domain/post/post/fragments/postListItem :: postListItem(${post})"/>
         </li>
     </ul>
 

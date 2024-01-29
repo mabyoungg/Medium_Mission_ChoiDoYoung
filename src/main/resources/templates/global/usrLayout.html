@@ -8,16 +8,46 @@
 <body>
 
 <header layout:fragment="header">
-    <h1 th:text="|${@appConfig.siteName}|"></h1>
-
-    <a href="/">홈</a>
-    <a href="/post/list">글 목록</a>
-    <a th:if="${@rq.admin}" href="/adm">관리자 홈</a>
-    <a th:if="${@rq.login}" href="/post/write">글 쓰기</a>
-    <a th:if="${@rq.login}" href="/post/myList">내글 목록</a>
-    <a th:if="${@rq.login}" href="/member/logout">로그아웃</a>
-    <a th:if="${@rq.logout}" href="/member/login">로그인</a>
-    <a th:if="${@rq.logout}" href="/member/join">회원가입</a>
+    <div class="flex-none">
+        <div class="dropdown">
+            <div tabindex="0" role="button" class="btn btn-ghost btn-circle">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                     stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7"/>
+                </svg>
+            </div>
+            <ul tabindex="0" class="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52">
+                <li><a href="/"><i class="fa-solid fa-house"></i> 홈</a></li>
+                <li><a href="/post/list"><i class="fa-solid fa-list"></i> 글</a></li>
+                <li th:if="${@rq.admin}"><a href="/adm"><i class="fa-solid fa-gauge"></i> 관리자 홈</a></li>
+                <li th:if="${@rq.login}"><a method="POST" href="/post/makeTemp"><i class="fa-solid fa-pen"></i> 글 쓰기</a></li>
+                <li th:if="${@rq.login}"><a href="/post/myList"><i class="fa-solid fa-list-check"></i> 내글</a></li>
+            </ul>
+        </div>
+    </div>
+    <div class="flex-1">
+        <a class="btn btn-ghost text-xl" href="/" th:text="|${@appConfig.siteName}|"></a>
+    </div>
+    <div class="flex-none">
+        <a th:if="${@rq.login}" href="/member/me" class="btn btn-ghost btn-circle">
+            <img class="w-[30px] h-[30px] rounded-full object-cover" th:src="${@rq.profileImgUrl}">
+        </a>
+        <div class="dropdown dropdown-bottom dropdown-end">
+            <div tabindex="0" role="button" class="btn btn-ghost btn-circle">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                     class="inline-block w-5 h-5 stroke-current">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M5 12h.01M12 12h.01M19 12h.01M6 12a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0z"></path>
+                </svg>
+            </div>
+            <ul tabindex="0" class="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52">
+                <li th:if="${@rq.logout}"><a href="/member/login"><i class="fa-solid fa-right-to-bracket"></i> 로그인</a></li>
+                <li th:if="${@rq.logout}"><a href="/member/join"><i class="fa-solid fa-user-plus"></i> 회원가입</a></li>
+                <li th:if="${@rq.login}"><a href="/member/logout"><i class="fa-solid fa-right-from-bracket"></i> 로그아웃</a></li>
+                <li th:if="${@rq.login}"><a href="/member/me"><i class="fa-solid fa-user"></i> 내 정보</a></li>
+            </ul>
+        </div>
+    </div>
 </header>
 
 </body>

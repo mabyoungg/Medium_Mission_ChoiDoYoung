@@ -19,9 +19,11 @@ import static lombok.AccessLevel.PROTECTED;
 @Builder
 @Getter
 @Setter
+@ToString(callSuper = true)
 public class Member extends BaseEntity {
     private String username;
     private String password;
+    private int membershipLevel;
 
     @Transient
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -29,9 +31,11 @@ public class Member extends BaseEntity {
 
         authorities.add(new SimpleGrantedAuthority("ROLE_MEMBER"));
 
-        if (List.of("system", "admin").contains(username)) {
+        if (membershipLevel > 0)
+            authorities.add(new SimpleGrantedAuthority("ROLE_PAID"));
+
+        if (List.of("system", "admin").contains(username))
             authorities.add(new SimpleGrantedAuthority("ROLE_ADMIN"));
-        }
 
         return authorities;
     }

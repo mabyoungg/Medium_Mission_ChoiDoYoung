@@ -1,10 +1,12 @@
 <!doctype html>
-<html lang="ko">
+<html lang="ko" data-theme="light">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/2.1.4/toastr.min.js"></script>
     <link href="https://jhs512.github.io/toastr/toastr.css" rel="stylesheet">
@@ -19,11 +21,20 @@
         const urlParams = getUrlParams(location.href);
     </script>
 </head>
-<body>
+<body class="min-h-[100dvh] flex flex-col">
 
-<th:block layout:fragment="header"></th:block>
+<link href="https://cdn.jsdelivr.net/npm/daisyui@4.5.0/dist/full.min.css" rel="stylesheet" type="text/css" />
+<script src="https://cdn.tailwindcss.com"></script>
 
-<th:block layout:fragment="content"></th:block>
+<header layout:fragment="header" class="navbar bg-base-100 shadow-sm sticky top-0"></header>
+
+<main class="flex-1 flex justify-center items-center">
+    <th:block layout:fragment="content" class="max-w-lg w-full"></th:block>
+</main>
+
+<footer class="p-2 shadow text-center text-gray-300 text-sm">
+    MEDIUM ALL RIGHTS RESERVED.
+</footer>
 
 <script>
     // history.back 에 의해서 돌아온 경우에 자바스크립트가 실행이 안될 수 도 잇다.
