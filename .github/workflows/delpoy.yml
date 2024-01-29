@@ -59,7 +59,7 @@ jobs:
           APPLICATION_SECRET_YML: ${{ secrets.APPLICATION_SECRET_YML }}
         run: |
           echo "APPLICATION_SECRET_YML" > src/main/resources/application-secret.yml
-          cat src/main/resources/application-secret.yml
+          echo "APPLICATION_SECRET_YML: $APPLICATION_SECRET_YML"
       - name: 빌드 앤 푸시
         uses: docker/build-push-action@v3
         with:
